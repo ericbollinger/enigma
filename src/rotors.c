@@ -24,13 +24,13 @@ char *available_reflectors[3] = {
     "FVPJIAOYEDRZXWGCTKUQSBNMHL"
 };
 
-// The letters that trigger a rotation for each rotor
-char *notches[5] = {
-    "Q",
-    "E",
-    "V",
-    "J",
-    "Z"
+// The letters that trigger a rotation for the next rotor
+int notches[5] = {
+    17, // Q becomes R
+    5,  // E becomes F
+    22, // V becomes W
+    10, // J becomes K
+    0   // Z becomes A
 };
 
 
@@ -43,11 +43,11 @@ init_enigma(int *rotors, int *positions, int reflector) {
          * Subtract 1 from the rotor number to uphold the documented numbering
          * scheme for the rotors, i.e. 1-5 instead of 0-4
          */
-        g_setup->rotors[i] = available_rotors[rotors[i-1]];
+        g_setup->rotors[i] = available_rotors[rotors[i]-1];
         g_setup->rotor_positions[i] = positions[i];
     }
 
-    g_setup->reflector = available_reflectors[reflector];
+    g_setup->reflector = available_reflectors[reflector-1];
 }
 
 void
@@ -114,8 +114,34 @@ reflect(int input) {
     return char_to_int(reflector_output);
 }
 
+void
+rotate() {
+    printf("Rotating first ring...\n");
+    int *pos_list = g_setup->rotor_positions;
+    pos_list[0] += 1;
+    pos_list[0] %= 26;
+
+    if (pos_list[0] != notches[0]) {
+        return;
+    }
+
+    printf("Rotating second ring...\n");
+    pos_list[1] += 1;
+    pos_list[1] %= 26;
+
+    if (pos_list[1] != notches[1]) {
+        return;
+    }
+
+    printf("Rotating third ring...\n");
+    pos_list[2] += 1;
+    pos_list[2] %= 26;
+}
+
 char
 enigmatize(char input) {
+    rotate();
+
     int cur = char_to_int(input);
     for (int i = 0; i < NUM_ROTORS; i++) {
         cur = rotor_encode(i, cur, FORWARD);
@@ -126,6 +152,6 @@ enigmatize(char input) {
     for (int i = NUM_ROTORS - 1; i >= 0; i--) {
         cur = rotor_encode(i, cur, BACKWARD);
     }
-
+    printf("--------------------------------------------------\n\n");
     return int_to_char(cur);
 }

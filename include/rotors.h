@@ -15,4 +15,5 @@ int char_to_int(char);
 char int_to_char(int);
 int rotor_encode(int, int, direction_e);
 int reflect(int);
+void rotate();
 char enigmatize(char);
