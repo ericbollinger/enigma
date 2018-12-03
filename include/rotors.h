@@ -7,8 +7,12 @@ typedef struct {
     int   rotor_positions[3];   
 } setup;
 
-void rotor_init(int*, int*, int);
+typedef enum direction { FORWARD, BACKWARD } direction_e;
+
+void init_enigma(int*, int*, int);
+void teardown_enigma();
 int char_to_int(char);
 char int_to_char(int);
-int rotor_encode(int, int);
+int rotor_encode(int, int, direction_e);
+int reflect(int);
 char enigmatize(char);
