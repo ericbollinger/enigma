@@ -5,7 +5,7 @@
 
 int main() {
     int rotors[3] = {1,2,3};
-    int positions[3] = {0,0,0};
+    int positions[3] = {16,0,0};
     int reflector = 2;
 
     init_enigma(rotors, positions, reflector);

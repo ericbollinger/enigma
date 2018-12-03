@@ -68,13 +68,13 @@ int_to_char(int number) {
 int
 rotor_encode(int rotor, int input, direction_e dir) {
     char *letters = g_setup->rotors[rotor];
-    printf("Letters: %s\n", letters);
+    //printf("Letters: %s\n", letters);
 
     int offset = g_setup->rotor_positions[rotor];
-    printf("Offset: %d\n", offset);
+    //printf("Offset: %d\n", offset);
 
     int rotor_input = (input + offset) % 26;
-    printf("Rotor input: %d\n", rotor_input);
+    //printf("Rotor input: %d\n", rotor_input);
 
     int rotor_output = 0;
     if (dir == FORWARD) {
@@ -92,24 +92,28 @@ rotor_encode(int rotor, int input, direction_e dir) {
 
         char *pos = strstr(letters, char_ptr);
         rotor_output = pos - letters;
-        printf("String position: %c at %d\n", tmp_c, rotor_output);
+        //printf("String position: %c at %d\n", tmp_c, rotor_output);
 
         free(char_ptr);
 
     }
 
-    printf("Rotor output: %c\n\n", int_to_char(rotor_output));
+    //printf("Rotor output: %c\n\n", int_to_char(rotor_output));
+
+    rotor_output -= offset;
+    rotor_output = (rotor_output < 0) ? rotor_output + 26 : rotor_output;
+
     return rotor_output;
 }
 
 int
 reflect(int input) {
     char *letters = g_setup->reflector;
-    printf("Reflector letters: %s\n", letters);
+    //printf("Reflector letters: %s\n", letters);
 
     int reflector_output = letters[input];
-    printf("Reflector input: %d\n", input);
-    printf("Reflector output: %c\n\n", reflector_output);
+    //printf("Reflector input: %d\n", input);
+    //printf("Reflector output: %c\n\n", reflector_output);
 
     return char_to_int(reflector_output);
 }
@@ -152,6 +156,6 @@ enigmatize(char input) {
     for (int i = NUM_ROTORS - 1; i >= 0; i--) {
         cur = rotor_encode(i, cur, BACKWARD);
     }
-    printf("--------------------------------------------------\n\n");
+//    printf("--------------------------------------------------\n\n");
     return int_to_char(cur);
 }
