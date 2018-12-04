@@ -34,8 +34,7 @@ int notches[5] = {
 };
 
 
-void
-init_enigma(int *rotors, int *positions, int reflector) {
+void init_enigma(int *rotors, int *positions, int reflector) {
     g_setup = malloc(sizeof(setup));
 
     for (int i = 0; i < NUM_ROTORS; i++) {
@@ -50,23 +49,19 @@ init_enigma(int *rotors, int *positions, int reflector) {
     g_setup->reflector = available_reflectors[reflector-1];
 }
 
-void
-teardown_enigma() {
+void teardown_enigma() {
     free(g_setup);
 }
 
-int
-char_to_int(char letter) {
+int char_to_int(char letter) {
     return letter - 'A';
 }
 
-char
-int_to_char(int number) {
+char int_to_char(int number) {
     return number + 'A';
 }
 
-int
-rotor_encode(int rotor, int input, direction_e dir) {
+int rotor_encode(int rotor, int input, direction_e dir) {
     char *letters = g_setup->rotors[rotor];
     //printf("Letters: %s\n", letters);
 
@@ -106,8 +101,7 @@ rotor_encode(int rotor, int input, direction_e dir) {
     return rotor_output;
 }
 
-int
-reflect(int input) {
+int reflect(int input) {
     char *letters = g_setup->reflector;
     //printf("Reflector letters: %s\n", letters);
 
@@ -118,8 +112,7 @@ reflect(int input) {
     return char_to_int(reflector_output);
 }
 
-void
-rotate() {
+void rotate() {
     printf("Rotating first ring...\n");
     int *pos_list = g_setup->rotor_positions;
     pos_list[0] += 1;
@@ -142,8 +135,7 @@ rotate() {
     pos_list[2] %= 26;
 }
 
-char
-enigmatize(char input) {
+char enigmatize(char input) {
     rotate();
 
     int cur = char_to_int(input);
