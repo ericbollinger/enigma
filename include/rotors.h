@@ -1,3 +1,5 @@
+#define DEBUG 0
+
 typedef struct {
     // Pointers to the three selected rotors, in order
     char *rotors[3];
