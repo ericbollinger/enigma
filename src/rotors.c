@@ -5,6 +5,7 @@
 #include "rotors.h"
 
 #define NUM_ROTORS 3
+#define DEBUG 1
 
 static setup *g_setup;
 
@@ -26,11 +27,11 @@ char *available_reflectors[3] = {
 
 // The letters that trigger a rotation for the next rotor
 int notches[5] = {
-    17, // Q becomes R
-    5,  // E becomes F
-    22, // V becomes W
-    10, // J becomes K
-    0   // Z becomes A
+    16, // Q is about to become R
+    4,  // E is about to become F
+    21, // V is about to become W
+    9,  // J is about to become K
+    25  // Z is about to become A
 };
 
 
@@ -63,13 +64,13 @@ char int_to_char(int number) {
 
 int rotor_encode(int rotor, int input, direction_e dir) {
     char *letters = g_setup->rotors[rotor];
-    //printf("Letters: %s\n", letters);
+    if (DEBUG) printf("Letters: %s\n", letters);
 
     int offset = g_setup->rotor_positions[rotor];
-    //printf("Offset: %d\n", offset);
+    if (DEBUG) printf("Offset: %d\n", offset);
 
     int rotor_input = (input + offset) % 26;
-    //printf("Rotor input: %d\n", rotor_input);
+    if (DEBUG) printf("Rotor input: %d\n", rotor_input);
 
     int rotor_output = 0;
     if (dir == FORWARD) {
@@ -87,13 +88,13 @@ int rotor_encode(int rotor, int input, direction_e dir) {
 
         char *pos = strstr(letters, char_ptr);
         rotor_output = pos - letters;
-        //printf("String position: %c at %d\n", tmp_c, rotor_output);
+        if (DEBUG) printf("String position: %c at %d\n", tmp_c, rotor_output);
 
         free(char_ptr);
 
     }
 
-    //printf("Rotor output: %c\n\n", int_to_char(rotor_output));
+    if (DEBUG) printf("Rotor output: %c\n\n", int_to_char(rotor_output));
 
     rotor_output -= offset;
     rotor_output = (rotor_output < 0) ? rotor_output + 26 : rotor_output;
@@ -103,36 +104,42 @@ int rotor_encode(int rotor, int input, direction_e dir) {
 
 int reflect(int input) {
     char *letters = g_setup->reflector;
-    //printf("Reflector letters: %s\n", letters);
+    //if (DEBUG) printf("Reflector letters: %s\n", letters);
 
     int reflector_output = letters[input];
-    //printf("Reflector input: %d\n", input);
-    //printf("Reflector output: %c\n\n", reflector_output);
+    if (DEBUG) printf("Reflector input: %d\n", input);
+    if (DEBUG) printf("Reflector output: %c\n\n", reflector_output);
 
     return char_to_int(reflector_output);
 }
 
 void rotate() {
-    printf("Rotating first ring...\n");
+    if (DEBUG) printf("Rotating first ring...\n");
+
+    int rotating_mark[NUM_ROTORS];
     int *pos_list = g_setup->rotor_positions;
-    pos_list[0] += 1;
-    pos_list[0] %= 26;
 
-    if (pos_list[0] != notches[0]) {
-        return;
+    for (int i = 1; i < NUM_ROTORS; i++) {
+        rotating_mark[i] = (pos_list[i] == notches[i]) ? 1 : 0;
     }
 
-    printf("Rotating second ring...\n");
-    pos_list[1] += 1;
-    pos_list[1] %= 26;
+    // Always rotate first rotor
+    rotating_mark[0] = 1;
 
-    if (pos_list[1] != notches[1]) {
-        return;
+    for (int i = 0; i < NUM_ROTORS; i++) {
+        if (pos_list[i] == notches[i]) {
+            rotating_mark[i] = 1;
+            if (i + 1 < NUM_ROTORS) {
+                rotating_mark[i + 1] = 1;
+            }
+        }
+
+        if (rotating_mark[i] == 1) {
+            if (DEBUG) printf("Rotating Ring #%d...\n", i+1);
+            pos_list[i] += 1;
+            pos_list[i] %= 26;
+        }
     }
-
-    printf("Rotating third ring...\n");
-    pos_list[2] += 1;
-    pos_list[2] %= 26;
 }
 
 char enigmatize(char input) {
@@ -148,6 +155,6 @@ char enigmatize(char input) {
     for (int i = NUM_ROTORS - 1; i >= 0; i--) {
         cur = rotor_encode(i, cur, BACKWARD);
     }
-//    printf("--------------------------------------------------\n\n");
+    printf("--------------------------------------------------\n\n");
     return int_to_char(cur);
 }
